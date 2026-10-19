@@ -1,0 +1,13 @@
+{
+  "engine_version": "0.52.0",
+  "cell": "OpenMW Engine Laboratory",
+  "mod_data": ["../../mod"],
+  "content": ["WillfulFlight.omwscripts"],
+  "owners": [],
+  "casters": [],
+  "items": [],
+  "presets": {
+    "weak": 15,
+    "strong": 90
+  }
+}

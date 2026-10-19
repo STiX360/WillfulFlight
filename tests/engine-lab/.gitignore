@@ -1,0 +1,5 @@
+.runtime/
+__pycache__/
+*.pyc
+EngineLab.esp
+scripts/engine_lab/config.lua

@@ -1,0 +1,43 @@
+__pycache__/
+*.py[cod]
+.venv/
+.runtime/
+.publishing/
+/PUBLISHING.md
+dist/
+reports/
+.pytest_cache/
+
+# Workstation configuration, assistant instructions, and private publishing drafts
+.local/
+.env
+.env.*
+!.env.example
+/AGENTS.md
+.agents/
+.codex/
+
+# Reference downloads and abandoned engine investigations are never mod sources
+/reference/
+/references/
+/.reference/
+/.references/
+/local-reference/
+/research/
+/sources/
+/engine-source/
+/downloads/
+/build/
+*.zip
+*.7z
+*.rar
+*.tar
+*.tar.gz
+
+# Native acceptance reports can include absolute workstation paths
+/tests/stock-engine-*.json
+*.omwsave
+*.dmp
+*.log
+.DS_Store
+Thumbs.db

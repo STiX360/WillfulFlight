@@ -1,0 +1,3 @@
+GLOBAL: scripts/engine_lab/global.lua
+PLAYER: scripts/engine_lab/player.lua
+CUSTOM: scripts/engine_lab/caster.lua

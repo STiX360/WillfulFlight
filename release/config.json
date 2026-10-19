@@ -1,0 +1,18 @@
+{
+  "name": "Willful Flight",
+  "slug": "willful-flight",
+  "identity": "WillfulFlight",
+  "namespace": "willful_flight",
+  "engine_version": "0.52.0",
+  "version_file": "VERSION",
+  "main_branch": "main",
+  "prerelease": false,
+  "content_manifest": "WillfulFlight.omwscripts",
+  "files": {
+    "mod/WillfulFlight.omwscripts": "WillfulFlight.omwscripts",
+    "mod/scripts/willful_flight/player.lua": "scripts/willful_flight/player.lua",
+    "mod/scripts/willful_flight/policy.lua": "scripts/willful_flight/policy.lua",
+    "mod/scripts/willful_flight/global.lua": "scripts/willful_flight/global.lua",
+    "mod/l10n/WillfulFlight/en.yaml": "l10n/WillfulFlight/en.yaml"
+  }
+}
