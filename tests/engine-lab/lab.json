@@ -1,5 +1,6 @@
 {
   "engine_version": "0.52.0",
+  "expected_cases": 16,
   "cell": "OpenMW Engine Laboratory",
   "mod_data": ["../../mod"],
   "content": ["WillfulFlight.omwscripts"],

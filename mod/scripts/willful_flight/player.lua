@@ -5,12 +5,26 @@ local storage = require('openmw.storage')
 local I = require('openmw.interfaces')
 local policy = require('scripts.willful_flight.policy')
 local group = 'SettingsPlayerWillfulFlight'
-I.Settings.registerPage {key='WillfulFlight', l10n='WillfulFlight', name='Page'}
+I.Settings.registerPage {key='WillfulFlight', l10n='WillfulFlight', name='Page', description='PageDescription'}
+I.Settings.registerPage {key='WillfulFlightCalculation', l10n='WillfulFlight',
+    name='CalculationPage', description='CalculationDescription'}
 I.Settings.registerGroup {
     key=group, page='WillfulFlight', l10n='WillfulFlight', name='Group', permanentStorage=false,
-    settings={{key='enabled', renderer='checkbox', name='Enabled', default=true}},
+    settings={
+        {key='enabled', renderer='checkbox', name='Enabled', description='EnabledDescription', default=true},
+        {key='willpowerWeight', renderer='number', name='WillpowerWeight', default=100,
+            description='WillpowerWeightDescription', argument={min=0,max=1000}},
+        {key='speedWeight', renderer='number', name='SpeedWeight', default=0,
+            description='SpeedWeightDescription', argument={min=0,max=1000}},
+        {key='multiplier', renderer='number', name='Multiplier', default=1,
+            description='MultiplierDescription', argument={min=.1,max=3}},
+    },
 }
 local settings = storage.playerSection(group)
+local function options()
+    return policy.options({willpowerWeight=settings:get('willpowerWeight'),
+        speedWeight=settings:get('speedWeight'),multiplier=settings:get('multiplier')})
+end
 local helpers, wanted, nextRefresh, lastFactor = {}, nil, 0, 0
 local diagnostic = {ratio=1, original=0, helper=0, applied=false}
 
@@ -55,7 +69,7 @@ end
 local function update()
     local speed, willpower, original, _, minimum, maximum, load = values()
     if not allowed(original,maximum,minimum,load) then clear(); return end
-    local amount = policy.lift(speed,willpower)
+    local amount = policy.lift(speed,willpower,original,minimum,maximum,options())
     if amount == 0 then clear(); return end
     if wanted ~= amount then
         wanted = amount
@@ -81,7 +95,7 @@ local function frame()
     -- Do not attenuate ground/swimming movement when the engine has blocked levitation.
     local flying = allowed(original,maximum,minimum,load)
         and policy.matchesFlight(types.Actor.getCurrentSpeed(self),native,lastFactor)
-    if flying then ratio=policy.ratio(speed,willpower,original,helper,minimum,maximum,load,penalty) end
+    if flying then ratio=policy.ratio(speed,willpower,original,helper,minimum,maximum,load,penalty,options()) end
     local scaledForward, scaledSide, factor = policy.inputs(forward,side,ratio)
     if flying then self.controls.movement, self.controls.sideMovement=scaledForward,scaledSide end
     lastFactor = flying and factor or math.min(1,math.sqrt(forward*forward+side*side))
@@ -95,10 +109,11 @@ return {
         for id, amount in pairs(data.records) do helpers[id]=amount end
     end},
     engineHandlers={onUpdate=update, onFrame=frame,
-        onSave=function() return {helpers=helpers, enabled=policy.enabled(settings:get('enabled'))} end,
+        onSave=function() return {helpers=helpers, enabled=policy.enabled(settings:get('enabled')), options=options()} end,
         onLoad=function(data)
             helpers=data and data.helpers or {}; lastFactor=0; wanted=nil; nextRefresh=0
             if data then settings:set('enabled',data.enabled ~= false) end
+            for key, value in pairs(policy.options(data and data.options)) do settings:set(key,value) end
         end,
     },
 }

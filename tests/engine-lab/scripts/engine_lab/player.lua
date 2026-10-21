@@ -25,6 +25,14 @@ local cases = {
     {name='damaged Willpower', speed=20, will=80, damage=40},
     {name='ground walking slow Speed', speed=20, will=80, ground=true},
     {name='ground walking fast Speed', speed=90, will=20, ground=true},
+    {name='equal attribute blend',speed=20,will=80,willpowerWeight=50,speedWeight=50},
+    {name='vanilla attribute blend',speed=90,will=20,willpowerWeight=0,speedWeight=100},
+    {name='1000 percent Willpower contribution',speed=20,will=80,willpowerWeight=1000},
+    {name='minimum multiplier',speed=90,will=20,multiplier=.1},
+    {name='half multiplier',speed=90,will=80,multiplier=.5},
+    {name='double multiplier',speed=20,will=80,multiplier=2},
+    {name='maximum multiplier',speed=20,will=20,multiplier=3},
+    {name='configured ground control',speed=20,will=80,multiplier=3,ground=true},
 }
 
 local function capture()
@@ -87,6 +95,10 @@ local function startCase()
         return
     end
     preset(case.speed, case.will, case.modifier, case.damage)
+    local settings=storage.playerSection('SettingsPlayerWillfulFlight')
+    settings:set('willpowerWeight',case.willpowerWeight or 100)
+    settings:set('speedWeight',case.speedWeight or 0)
+    settings:set('multiplier',case.multiplier or 1)
     levitate(not case.ground)
     core.sendGlobalEvent('EngineLabPosition', {})
     due = core.getSimulationTime() + 1.2
@@ -99,12 +111,14 @@ local function checkCase()
     if case.ground then
         expected = types.Actor.getWalkSpeed(self)
     else
-        local attribute = config.flight_enabled and types.Actor.stats.attributes.willpower(self).modified
-            or types.Actor.stats.attributes.speed(self).modified
+        local will=types.Actor.stats.attributes.willpower(self).modified
+        local speed=types.Actor.stats.attributes.speed(self).modified
+        local attribute=config.flight_enabled and (will*(case.willpowerWeight or 100)+speed*(case.speedWeight or 0))/100 or speed
         local minimum, maximum = core.getGMST('fMinFlySpeed'), core.getGMST('fMaxFlySpeed')
         local load = types.Actor.getEncumbrance(self) / types.Actor.getCapacity(self)
         expected = math.max(0, (minimum + .01 * (attribute + 10) * (maximum-minimum))
             * (1 - core.getGMST('fEncumberedMoveEffect') * load))
+        if config.flight_enabled then expected=expected*(case.multiplier or 1) end
     end
     local match = math.abs(actual-expected) <= math.max(.1, expected*.005)
     log.assertion({case=case.name, status=match and 'pass' or 'fail',

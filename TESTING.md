@@ -2,11 +2,13 @@
 
 | Evidence | Status |
 | --- | --- |
-| Lua 5.1 policy + production packaging suite | 19 tests passed, 2026-10-13 |
-| Stock OpenMW 0.52.0 calculated speeds | Eight native cases passed |
-| Disabled-mod control | Eight native cases passed; tests/stock-engine-disabled.json |
+| Lua 5.1 policy + production packaging suite | 32 tests passed, 2026-10-21; settings matrix includes 4,800 combinations, up to 1000% and helper-cap saturation; localized page descriptions and non-resettable formula page checked |
+| Stock OpenMW 0.52.0 calculated speeds | 16 native cases passed; tests/settings-engine-enabled.json |
+| Stock OpenMW 0.51.0 calculated speeds | 16 native cases passed; tests/settings-engine-051.json |
+| Disabled-mod control | 16 native cases passed; tests/settings-engine-disabled.json |
 | Manual behavior and settings | Pending |
-| Save/reload, disable/remove | Save/reload and uninstall pending; removing source levitation checked |
+| Custom settings save/reload | Five native stages, 48 assertions passed on 0.52.0; tests/settings-save-engine.json |
+| Removal | Prior v0.1.0 lifecycle checks passed on 0.51.0; removal not repeated for configurable build |
 | Mod-list compatibility | Pending |
 | Balance/playthrough acceptance | Pending |
 
@@ -27,3 +29,10 @@ This is the installed unchanged stock engine, not the abandoned engine build.
 Enabled evidence: tests/stock-engine-enabled.json.
 
 Mocked Lua callbacks do not establish actual engine API behavior or event order.
+
+The configurable build's native save test creates a baseline without the mod,
+adds it with 50% Willpower, 25% Speed and a 1.5 multiplier, then saves/restarts/
+reloads active, disabled and disabled-reloaded states. It checks actual travel,
+calculated speed, helper non-stacking, attribute preservation and setting values.
+These controlled profiles do not establish arbitrary existing-save/mod-list
+compatibility. Interactive settings layout and input validation remain manual QA.

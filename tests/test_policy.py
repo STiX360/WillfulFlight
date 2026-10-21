@@ -76,3 +76,51 @@ class PolicyTests(unittest.TestCase):
             assert(not p.matchesFlight(50,190,1))
             assert(not p.matchesFlight(0,190,0))
         """)
+
+    def test_settings_defaults_validation_and_blend(self):
+        self.lua.execute("""
+            local p=require('scripts.willful_flight.policy')
+            local o=p.options({willpowerWeight=0/0,speedWeight=-1,multiplier=math.huge})
+            assert(o.willpowerWeight==100 and o.speedWeight==0 and o.multiplier==1)
+            assert(p.options({multiplier=0}).multiplier==1)
+            assert(p.options('invalid').willpowerWeight==100)
+            assert(p.attribute(20,80,{willpowerWeight=50,speedWeight=50})==50)
+            assert(p.attribute(20,80,{willpowerWeight=0,speedWeight=100})==20)
+            assert(p.attribute(20,80,{willpowerWeight=200,speedWeight=200})==200)
+            assert(p.attribute(20,80,{willpowerWeight=1000,speedWeight=1000})==1000)
+        """)
+
+    def test_configured_targets_converge_across_formula_and_load(self):
+        self.lua.execute("""
+            local p=require('scripts.willful_flight.policy')
+            for _, speed in ipairs({0,20,90,200}) do
+              for _, will in ipairs({0,20,80,200.5}) do
+               for _, weight in ipairs({0,50,100,200,1000}) do
+                for _, mult in ipairs({.1,.5,1,1.5,3}) do
+                 for _, magnitude in ipairs({1,10,50}) do
+                  for _, load in ipairs({0,.5,1,1.1}) do
+                    local o={willpowerWeight=weight,speedWeight=50,multiplier=mult}
+                    local helper=p.lift(speed,will,magnitude,5,300,o)
+                    local ratio=p.ratio(speed,will,magnitude,helper,5,300,load,.5,o)
+                    local actual=p.speed(speed,magnitude+helper,5,300,load,.5)*ratio
+                    local target=p.target(speed,will,magnitude,5,300,load,.5,o)
+                    assert(math.abs(actual-math.min(target,p.speed(speed,magnitude+5000,5,300,load,.5)))<.00001)
+                    assert(ratio>=0 and ratio<=1 and helper>=0 and helper<=5000)
+                  end
+                 end
+                end
+               end
+              end
+            end
+        """)
+
+    def test_multiplier_includes_base_speed_and_original_strength(self):
+        self.lua.execute("""
+            local p=require('scripts.willful_flight.policy')
+            local o={multiplier=2}
+            local h=p.lift(20,20,10,100,400,o)
+            assert(h>20)
+            assert(p.target(20,20,10,100,400,0,.5,o)==380)
+            assert(p.lift(0,100000,10,5,300,o)==5000)
+            assert(p.lift(20,80,10,100,100,o)==0)
+        """)

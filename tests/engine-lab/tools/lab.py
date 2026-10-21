@@ -140,7 +140,7 @@ def run(root, smoke=False, timeout=45, allow_parallel=False):
     (root / 'scripts/engine_lab/config.lua').write_text('return ' + lua(config) + '\n', encoding='utf-8')
     (root / '.runtime/prepared.json').write_text(json.dumps(state, indent=2) + '\n', encoding='utf-8')
     args = [state['engine'], '--replace', 'config', '--config', state['profile'], '--user-data', state['user_data'],
-            '--skip-menu', '--new-game=0', '--start', config['cell'], '--no-grab']
+            '--skip-menu', '--new-game=0', '--start', config['cell'], '--no-grab', '--no-sound']
     startup = None
     if smoke and os.name == 'nt':
         startup = subprocess.STARTUPINFO()
@@ -167,7 +167,7 @@ def run(root, smoke=False, timeout=45, allow_parallel=False):
                                 for r in result['records'])):
         raise RuntimeError('Native probes did not all respond; inspect .runtime/report.json')
     if (process.returncode or not result['fixture_ready'] or result['errors'] or result['malformed']
-            or result['gameplay_status'] != 'pass' or len(result['assertions']) != 8
+            or result['gameplay_status'] != 'pass' or len(result['assertions']) != config.get('expected_cases',8)
             or not any(r['event'] == 'flight_complete' for r in result['records'])):
         raise RuntimeError('Fixture smoke failed; inspect .runtime/report.json')
     return result

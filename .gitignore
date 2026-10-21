@@ -36,6 +36,7 @@ reports/
 
 # Native acceptance reports can include absolute workstation paths
 /tests/stock-engine-*.json
+/tests/settings-*.json
 *.omwsave
 *.dmp
 *.log

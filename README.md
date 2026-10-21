@@ -11,6 +11,14 @@ Player levitation uses modified Willpower instead of Speed in the usual flight
 formula. Levitate magnitude and encumbrance still contribute. Fortify, Drain,
 and Damage Willpower are respected. Ordinary walking remains Speed-based.
 
+Options > Scripts > Willful Flight provides per-save numeric settings:
+Willpower contribution (0-1000%, default 100%), Speed contribution (0-1000%, default
+0%), and flight-speed multiplier (0.1-3, default 1). Contributions are independent,
+not automatically normalized. A 50%/50% split blends the two attributes; 0%/100%
+with multiplier 1 reproduces vanilla flight. The multiplier scales the whole
+calculated flight speed, including the source Levitate contribution.
+Defaults preserve earlier versions' behaviour, including when loading old saves.
+
 Lua supplies additional lift with a one-second temporary helper spell when
 Willpower exceeds Speed, and scales movement inputs to the target speed.
 There is no permanent effect magnitude modification or attribute swapping.
@@ -27,7 +35,8 @@ The original spell's records, duration and magnitude are not edited.
 - Stock-engine speed checks pass. Actual displacement, controller/diagonal
   movement, swimming, blocked-levitation areas, save/reload and POTI movement-mod
   interactions remain manual acceptance, not release-readiness claims.
-- Extremely boosted Willpower/Speed differences beyond 5000 are capped.
+- Extra helper lift is capped at 5000 points; extreme stats or settings that need
+  more lift cannot reach the requested speed.
 
 ## Installation
 

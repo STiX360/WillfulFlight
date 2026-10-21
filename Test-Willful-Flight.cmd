@@ -1,3 +1,3 @@
 @echo off
-pwsh -NoProfile -ExecutionPolicy Bypass -File "%~dp0tools\test-game.ps1" %*
+"%SystemRoot%\System32\WindowsPowerShell\v1.0\powershell.exe" -NoProfile -ExecutionPolicy Bypass -File "%~dp0tools\test-game.ps1" %*
 if errorlevel 1 pause
